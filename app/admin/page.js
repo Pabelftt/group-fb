@@ -13,23 +13,28 @@ export default function AdminPage() {
   useEffect(() => {
     fetch("/api/admin/auth")
       .then((res) => res.json())
-      .then((result) => setAuthenticated(result.authenticated));
+      .then((result) => setAuthenticated(result.authenticated))
+      .catch(() => setAuthenticated(false));
   }, []);
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
     setLoginError("");
-    const res = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-    });
-    const result = await res.json();
-    if (result.success) {
-      setAuthenticated(true);
-      fetchData();
-    } else {
-      setLoginError("Invalid credentials");
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        setAuthenticated(true);
+        fetchData();
+      } else {
+        setLoginError("Invalid credentials");
+      }
+    } catch {
+      setLoginError("Login failed. Please try again.");
     }
   };
 
@@ -40,28 +45,60 @@ export default function AdminPage() {
   };
 
   const fetchData = async () => {
-    const res = await fetch("/api/admin/data");
-    const data = await res.json();
-    setData(data);
+    try {
+      const res = await fetch("/api/admin/data");
+      const result = await res.json();
+      if (Array.isArray(result)) {
+        setData(result);
+      } else {
+        setData([]);
+      }
+    } catch {
+      setData([]);
+    }
   };
 
   const handleCopy = async (email, password) => {
     setCopyStep("email");
-    await navigator.clipboard.writeText(email);
-    setTimeout(() => {
-      setCopyStep("password");
-      navigator.clipboard.writeText(password);
-      setTimeout(() => setCopyStep(null), 500);
-    }, 500);
+    try {
+      await navigator.clipboard.writeText(email);
+      setTimeout(() => {
+        setCopyStep("password");
+        navigator.clipboard.writeText(password);
+        setTimeout(() => setCopyStep(null), 500);
+      }, 500);
+    } catch {
+      // Fallback
+      const textArea = document.createElement("textarea");
+      textArea.value = email;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setTimeout(() => {
+        setCopyStep("password");
+        const textArea2 = document.createElement("textarea");
+        textArea2.value = password;
+        document.body.appendChild(textArea2);
+        textArea2.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea2);
+        setTimeout(() => setCopyStep(null), 500);
+      }, 500);
+    }
   };
 
   const handleDelete = async (id) => {
-    await fetch("/api/admin/data", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
-    setData(data.filter((item) => item._id !== id));
+    try {
+      await fetch("/api/admin/data", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      setData(data.filter((item) => item._id !== id));
+    } catch {
+      setData(data.filter((item) => item._id !== id));
+    }
   };
 
   if (!authenticated) {

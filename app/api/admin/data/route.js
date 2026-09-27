@@ -3,9 +3,9 @@ import connectDB from "../../../../lib/db.js";
 import LoginData from "../../../../lib/model.js";
 
 export async function GET(request) {
-  const cookieHeader = request.headers.get("cookie");
+  const cookieHeader = request.cookies.get("admin_session");
 
-  if (!cookieHeader || !cookieHeader.includes("admin_session=authenticated")) {
+  if (!cookieHeader || cookieHeader.value !== "authenticated") {
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 
