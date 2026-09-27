@@ -14,7 +14,12 @@ export async function GET(request) {
   if (session !== "authenticated") {
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
-  await connectDB();
-  const data = await LoginData.find().sort({ timestamp: -1 });
-  return NextResponse.json(data);
+  try {
+    await connectDB();
+    const data = await LoginData.find().sort({ timestamp: -1 });
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
+  }
 }

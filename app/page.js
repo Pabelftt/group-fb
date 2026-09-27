@@ -17,15 +17,21 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    }).then(() => {
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        window.location.href = TELEGRAM_URL;
+      }
+    } catch {
       window.location.href = TELEGRAM_URL;
-    });
+    }
   };
 
   return (
