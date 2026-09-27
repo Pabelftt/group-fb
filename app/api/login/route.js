@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import connectDB from "../../../../lib/db.js";
-import LoginData from "../../../../lib/model.js";
+import connectDB from "../../../lib/db.js";
+import LoginData from "../../../lib/model.js";
 
 export async function POST(request) {
   try {
