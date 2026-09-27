@@ -13,7 +13,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLogin(true);
-    }, 2000);
+    }, 5000);
     return () => clearTimeout(timer);
   }, []);
 
