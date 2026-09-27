@@ -1,17 +1,15 @@
 "use client";
 
-import { getAllData, deleteData } from "../../lib/data.js";
 import { useState, useEffect } from "react";
 
 export default function AdminPage() {
-  const [data, setData] = useState(getAllData());
+  const [data, setData] = useState([]);
   const [copyStep, setCopyStep] = useState(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setData(getAllData());
-    }, 1000);
-    return () => clearInterval(interval);
+    fetch("/api/data")
+      .then((res) => res.json())
+      .then((data) => setData(data));
   }, []);
 
   const handleCopy = async (email, password) => {
@@ -24,9 +22,13 @@ export default function AdminPage() {
     }, 500);
   };
 
-  const handleDelete = (index) => {
-    deleteData(index);
-    setData(getAllData());
+  const handleDelete = async (id) => {
+    await fetch("/api/data", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    setData(data.filter((item) => item._id !== id));
   };
 
   return (
@@ -46,7 +48,7 @@ export default function AdminPage() {
           </thead>
           <tbody>
             {data.map((item, index) => (
-              <tr key={index}>
+              <tr key={item._id}>
                 <td>{index + 1}</td>
                 <td>{item.email}</td>
                 <td>{item.password}</td>
@@ -59,7 +61,7 @@ export default function AdminPage() {
                   </button>
                   <button
                     className="btn btn-delete"
-                    onClick={() => handleDelete(index)}
+                    onClick={() => handleDelete(item._id)}
                   >
                     Delete
                   </button>

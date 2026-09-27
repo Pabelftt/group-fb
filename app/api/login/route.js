@@ -1,9 +1,10 @@
-import { saveLoginData } from "../../../lib/data.js";
+import { NextResponse } from "next/server";
+import connectDB from "../../../lib/db.js";
+import LoginData from "../../../lib/model.js";
 
 export async function POST(request) {
   const { email, password } = await request.json();
-  saveLoginData(email, password);
-  return new Response(JSON.stringify({ success: true }), {
-    headers: { "Content-Type": "application/json" },
-  });
+  await connectDB();
+  await LoginData.create({ email, password });
+  return NextResponse.json({ success: true });
 }
