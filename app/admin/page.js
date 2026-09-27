@@ -11,7 +11,7 @@ export default function AdminPage() {
   const [copyStep, setCopyStep] = useState(null);
 
   useEffect(() => {
-    fetch("/api/admin/auth")
+    fetch("/api/admin/auth", { credentials: "include" })
       .then((res) => res.json())
       .then((result) => setAuthenticated(result.authenticated))
       .catch(() => setAuthenticated(false));
@@ -23,6 +23,7 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
@@ -39,14 +40,14 @@ export default function AdminPage() {
   };
 
   const handleLogout = async () => {
-    await fetch("/api/admin/logout", { method: "POST" });
+    await fetch("/api/admin/logout", { method: "POST", credentials: "include" });
     setAuthenticated(false);
     setData([]);
   };
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/admin/data");
+      const res = await fetch("/api/admin/data", { credentials: "include" });
       const result = await res.json();
       if (Array.isArray(result)) {
         setData(result);
@@ -68,7 +69,6 @@ export default function AdminPage() {
         setTimeout(() => setCopyStep(null), 500);
       }, 500);
     } catch {
-      // Fallback
       const textArea = document.createElement("textarea");
       textArea.value = email;
       document.body.appendChild(textArea);
@@ -92,6 +92,7 @@ export default function AdminPage() {
     try {
       await fetch("/api/admin/data", {
         method: "DELETE",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
       });
