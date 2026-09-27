@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import connectDB from "../../../../lib/db.js";
-import LoginData from "../../../../lib/model.js";
 
 export async function POST(request) {
   const { email, password } = await request.json();
@@ -19,6 +17,5 @@ export async function POST(request) {
     maxAge: 60 * 60 * 24,
     path: "/admin",
   });
-
   return response;
 }
