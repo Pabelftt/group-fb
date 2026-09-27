@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 
-export async function GET() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
-  if (session && session.value === "authenticated") {
+export async function GET(request) {
+  const cookieHeader = request.headers.get("cookie");
+
+  if (cookieHeader && cookieHeader.includes("admin_session=authenticated")) {
     return NextResponse.json({ authenticated: true });
   }
   return NextResponse.json({ authenticated: false });

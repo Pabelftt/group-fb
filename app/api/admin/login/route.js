@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import connectDB from "../../../../lib/db.js";
 import LoginData from "../../../../lib/model.js";
 
@@ -12,8 +11,8 @@ export async function POST(request) {
     return NextResponse.json({ success: false, message: "Invalid credentials" }, { status: 401 });
   }
 
-  const cookieStore = await cookies();
-  cookieStore.create("admin_session", "authenticated", {
+  const response = NextResponse.json({ success: true });
+  response.cookies.set("admin_session", "authenticated", {
     httpOnly: true,
     secure: false,
     sameSite: "lax",
@@ -21,5 +20,5 @@ export async function POST(request) {
     path: "/admin",
   });
 
-  return NextResponse.json({ success: true });
+  return response;
 }

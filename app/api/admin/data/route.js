@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import connectDB from "../../../../lib/db.js";
 import LoginData from "../../../../lib/model.js";
 
-export async function GET() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
+export async function GET(request) {
+  const cookieHeader = request.headers.get("cookie");
 
-  if (!session || session.value !== "authenticated") {
-    return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+  if (!cookieHeader || !cookieHeader.includes("admin_session=authenticated")) {
+    return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 
   await connectDB();
